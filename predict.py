@@ -1,4 +1,7 @@
-from llm import LLM, GPT4, Claude
+import os
+os.environ["OPENAI_API_KEY"] = "my_key"
+
+from llm import GPT4, LLM, Claude
 from formatter import Formatter
 import random
 import numpy as np
@@ -6,8 +9,15 @@ from generate_dataset import Sample
 import json
 from tqdm import tqdm
 
+# PREDICTION_FILE = "predictions_gpt4_mini.json"
+# llm = GPT4(mini=True)
+
+# PREDICTION_FILE = "predictions_gpt4o.json"
 # llm = GPT4(mini=False)
-llm = Claude()
+
+# PREDICTION_FILE = "predictions_Claude.json"
+# llm = Claude(key="my_key")
+
 formatter = Formatter()
 
 # Set random seed
@@ -51,14 +61,17 @@ Here is the grid after the transformation:
 
 Your answer should be one of the following: rotate, flip, shift, static
 Only answer with either rotate, flip, shift, or static. Nothing else.
-"""
-
+""" 
     response = llm.generate(prompt, temperature=0.0, seed=seed)
-    predictions[sample.uuid] = response
+    word = response.replace("\n", " ").split(" ")[0]
+    # print("\nlabel:", sample.transformation.type.value)
+    # print("prediction:", word)
+    # print("response:" , response)
+    predictions[sample.uuid] = word
     if response == sample.transformation.type.value:
         correct += 1
 
 print(f"Accuracy: {correct / len(dataset)}")
 # Save predictions
-with open("predictions.json", "w") as f:
+with open(PREDICTION_FILE, "w") as f:
     json.dump(predictions, f)

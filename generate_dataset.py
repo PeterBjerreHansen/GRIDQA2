@@ -8,7 +8,7 @@ import json
 import uuid
 
 # Set random seed
-seed = 2  # Seed to ensure it could generate without errors
+seed = 5141234  # Seed to ensure it could generate without errors
 random.seed(seed)
 np.random.seed(seed)
 
@@ -105,13 +105,18 @@ def generate_dataset(
             ]
 
             choice = random.choice(options)
+            # choice = options[i%len(options)]
+            print("")
+            print(random.choice(options))
+            print(options[i%len(options)])
+
             transformation_params: dict = {}
 
             shape_after = shape_before.copy()
             if choice == TransformationType.ROTATE:
-                degrees = random.choice([90, 180, 270])
-                shape_after = np.rot90(shape_after, degrees)
-                transformation_params["degrees"] = degrees
+                n_90_flips = random.choice([1, 2, 3])
+                shape_after = np.rot90(shape_after, n_90_flips)
+                transformation_params["degrees"] = int(360 - n_90_flips * 90)
             elif choice == TransformationType.FLIP:
                 shape_after = np.fliplr(shape_after)
 
@@ -186,7 +191,7 @@ def generate_dataset(
 
 if __name__ == "__main__":
 
-    dataset = generate_dataset(configurations, samples_per_configuration=10)
+    dataset = generate_dataset(configurations, samples_per_configuration=20)
     print(f"Generated {len(dataset)} samples")
 
     with open("dataset.json", "w") as f:
